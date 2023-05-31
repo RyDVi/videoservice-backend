@@ -1,0 +1,10 @@
+venv\Scripts\Activate.ps1
+$Env:DJANGO_SETTINGS_MODULE="backend.settings"
+$Env:PYTHONPATH="backend"
+$Env:USER="postgres"
+$Env:PGPASSWORD="admin"
+$Env:PGHOST="localhost"
+$Env:PGPORT="5432"
+$Env:OPENAI_API_KEY=""
+$Env:EMAIL_HOST="127.0.0.1"
+$Env:EMAIL_PORT="25"

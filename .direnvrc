@@ -1,0 +1,46 @@
+local_rawurlencode() {
+	local string="${1}"
+	local strlen=${#string}
+	local encoded=""
+	local pos c o
+
+	for (( pos=0 ; pos<strlen ; pos++ )); do
+		c=${string:$pos:1}
+		case "$c" in
+			[-_.~a-zA-Z0-9] ) o="${c}" ;;
+			* )   printf -v o '%%%02x' "'$c"
+		esac
+		encoded+="${o}"
+	done
+	echo "${encoded}"
+}
+
+layout_postgres() {
+	# PGDATA="$(direnv_layout_dir)/postgres"
+	# PGHOST="$PGDATA"
+	# export PGDATA PGHOST
+	PGDATABASE="${1-$USER}"
+	PGDATA="${2-$(direnv_layout_dir)/postgres}"
+	PGHOST="$PGDATA"
+	chmod 0750 "$PGDATA"
+	PGHOST_ESCAPED=$(local_rawurlencode "$PGHOST")
+	DATABASE_URL="postgresql://$PGHOST_ESCAPED/$PGDATABASE"
+	export PGDATA
+	export PGHOST
+	export PGHOST_ESCAPED
+	export PGDATABASE
+	export DATABASE_URL
+
+	if [[ ! -d "$PGDATA" ]]; then
+	log_status "Initializing postgres for this project..."
+		# If the data directory doesn't exist, create an empty one, and...
+		initdb
+		# ...configure it to listen only on the Unix socket, and...
+		cat >> "$PGDATA/postgresql.conf" <<-EOF
+			listen_addresses = ''
+			unix_socket_directories = '$PGHOST'
+		EOF
+		# ...create a database using the name Postgres defaults to.
+		echo "CREATE DATABASE $PGDATABASE;" | postgres --single -E postgres
+	fi
+}
