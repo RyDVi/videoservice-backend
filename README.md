@@ -70,7 +70,7 @@ If you don't have access then will be used default file storage.
 
 For using GPT need API Key:
 ```
-$Env:OPENAI_API_KEY="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"
+$Env:OPENAI_API_KEY=""
 ```
 
 ## First run
